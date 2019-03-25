@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 
+
 class SKConv(nn.Module):
     def __init__(self, features, WH, M, G, r, L=32):
         super(SKConv, self).__init__()
@@ -43,6 +44,36 @@ class SKConv(nn.Module):
         attention_vectors.unsqueeze_(-1).unsqueeze_(-1)
         fea_v = (feas * attention_vectors).sum(dim=1)
         return fea_v
+
+
+class SKUnit(nn.Module):
+    def __init__(self, in_features, out_features, WH, M, G, r, L=32):
+        super(SKUnit, self).__init__()
+        self.conv1 = nn.Conv2d(in_features, out_features, 1, stride=1)
+        self.skConv = SKConv(in_features, WH, M, G, r, L)
+        self.conv2 = nn.Conv2d(in_features, out_features, 1, stride=1)
+    
+    def forward(self, x):
+        fea = self.conv1(x)
+        fea = self.skConv(fea)
+        fea = self.conv2(fea)
+        return fea
+
+
+class ResNeXtUnit(nn.Module):
+    def __init__(self, in_features, out_features, mid_features=None, groups=32):
+        super(ResNeXtUnit, self).__init__()
+        if mid_features is None:
+            mid_features = int(in_features/2)
+        self.conv1 = nn.Conv2d(in_features, mid_features, 1, stride=1)
+        self.conv2 = nn.Conv2d(mid_features, mid_features, 3, stride=1, padding=1, groups=32)
+        self.conv3 = nn.Conv2d(mid_features, out_features, 1, stride=1)
+    
+    def forward(self, x):
+        fea = self.conv1(x)
+        fea = self.conv2(fea)
+        fea = self.conv3(fea)
+        return fea + x
 
 
 if __name__=='__main__':
