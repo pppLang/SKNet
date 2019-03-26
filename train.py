@@ -1,17 +1,22 @@
 import torch
-from model import ResNeXt
 
 
 def train_epoch(model, optimizer, train_loader, criterion, epoch, writer=None):
-    num = len(train_loader)
     model.train()
+    num = len(train_loader)
     for i, (data, label) in enumerate(train_loader):
         model.zero_grad()
         optimizer.zero_grad()
         data = data.cuda()
-        label = label.cuda()
+        label = label.cuda().long()
         result = model(data)
+        # print(result.shape)
+        # print(label.shape)
+        # print(result[0])
+        # print(label[0])
+        # exit()
         loss = criterion(result, label)
+        loss.backward()
         optimizer.step()
         if i%10==0:
             print('epoch {}, [{}/{}], loss {}'.format(epoch, i, num, loss))
