@@ -103,32 +103,32 @@ class SKNet(nn.Module):
         ) # 32x32
         self.stage_1 = nn.Sequential(
             SKUnit(64, 256, 32, 2, 8, 2, stride=2),
-            # nn.ReLU(),
+            nn.ReLU(),
             SKUnit(256, 256, 32, 2, 8, 2),
-            # nn.ReLU(),
+            nn.ReLU(),
             SKUnit(256, 256, 32, 2, 8, 2),
-            # nn.ReLU()
+            nn.ReLU()
         ) # 32x32
         self.stage_2 = nn.Sequential(
             SKUnit(256, 512, 32, 2, 8, 2, stride=2),
-            # nn.ReLU(),
+            nn.ReLU(),
             SKUnit(512, 512, 32, 2, 8, 2),
-            # nn.ReLU(),
+            nn.ReLU(),
             SKUnit(512, 512, 32, 2, 8, 2),
-            # nn.ReLU()
+            nn.ReLU()
         ) # 16x16
         self.stage_3 = nn.Sequential(
             SKUnit(512, 1024, 32, 2, 8, 2, stride=2),
-            # nn.ReLU(),
+            nn.ReLU(),
             SKUnit(1024, 1024, 32, 2, 8, 2),
-            # nn.ReLU(),
+            nn.ReLU(),
             SKUnit(1024, 1024, 32, 2, 8, 2),
-            # nn.ReLU()
+            nn.ReLU()
         ) # 8x8
         self.pool = nn.AvgPool2d(8)
         self.classifier = nn.Sequential(
             nn.Linear(1024, class_num),
-            nn.Softmax(dim=1)
+            # nn.Softmax(dim=1)
         )
 
     def forward(self, x):
