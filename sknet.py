@@ -4,6 +4,16 @@ from torch import nn
 
 class SKConv(nn.Module):
     def __init__(self, features, WH, M, G, r, stride=1 ,L=32):
+        """ Constructor
+        Args:
+            features: input channel dimensionality.
+            WH: input spatial dimensionality, used for GAP kernel size.
+            M: the number of branchs.
+            G: num of convolution groups.
+            r: the radio for compute d, the length of z.
+            stride: stride, default 1.
+            L: the minimum dim of the vector z in paper, default 32.
+        """
         super(SKConv, self).__init__()
         d = max(int(features/r), L)
         self.M = M
@@ -48,6 +58,18 @@ class SKConv(nn.Module):
 
 class SKUnit(nn.Module):
     def __init__(self, in_features, out_features, WH, M, G, r, mid_features=None, stride=1, L=32):
+        """ Constructor
+        Args:
+            in_features: input channel dimensionality.
+            out_features: output channel dimensionality.
+            WH: input spatial dimensionality, used for GAP kernel size.
+            M: the number of branchs.
+            G: num of convolution groups.
+            r: the radio for compute d, the length of z.
+            mid_features: the channle dim of the middle conv with stride not 1, default out_features/2.
+            stride: stride.
+            L: the minimum dim of the vector z in paper.
+        """
         super(SKUnit, self).__init__()
         if mid_features is None:
             mid_features = int(out_features/2)
@@ -81,32 +103,32 @@ class SKNet(nn.Module):
         ) # 32x32
         self.stage_1 = nn.Sequential(
             SKUnit(64, 256, 32, 2, 8, 2, stride=2),
-            nn.ReLU(),
+            # nn.ReLU(),
             SKUnit(256, 256, 32, 2, 8, 2),
-            nn.ReLU(),
+            # nn.ReLU(),
             SKUnit(256, 256, 32, 2, 8, 2),
-            nn.ReLU()
+            # nn.ReLU()
         ) # 32x32
         self.stage_2 = nn.Sequential(
             SKUnit(256, 512, 32, 2, 8, 2, stride=2),
-            nn.ReLU(),
+            # nn.ReLU(),
             SKUnit(512, 512, 32, 2, 8, 2),
-            nn.ReLU(),
+            # nn.ReLU(),
             SKUnit(512, 512, 32, 2, 8, 2),
-            nn.ReLU()
+            # nn.ReLU()
         ) # 16x16
         self.stage_3 = nn.Sequential(
             SKUnit(512, 1024, 32, 2, 8, 2, stride=2),
-            nn.ReLU(),
+            # nn.ReLU(),
             SKUnit(1024, 1024, 32, 2, 8, 2),
-            nn.ReLU(),
+            # nn.ReLU(),
             SKUnit(1024, 1024, 32, 2, 8, 2),
-            nn.ReLU()
+            # nn.ReLU()
         ) # 8x8
         self.pool = nn.AvgPool2d(8)
         self.classifier = nn.Sequential(
             nn.Linear(1024, class_num),
-            # nn.LogSoftmax(dim=1)
+            nn.Softmax(dim=1)
         )
 
     def forward(self, x):
@@ -122,7 +144,7 @@ class SKNet(nn.Module):
 
 if __name__=='__main__':
     x = torch.rand(8,64,32,32)
-    conv = SKConv(64, 32, 2, 8, 2)
+    conv = SKConv(64, 32, 3, 8, 2)
     out = conv(x)
     criterion = nn.L1Loss()
     loss = criterion(out, x)

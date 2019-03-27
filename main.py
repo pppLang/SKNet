@@ -26,7 +26,7 @@ if __name__=="__main__":
     optimizer = optim.Adam(net.parameters(), weight_decay=1e-6, betas=(0.9, 0.999))
     criterion = nn.CrossEntropyLoss().cuda()
 
-    log_path = './logs'
+    log_path = '.\\logs\\'
     writer = SummaryWriter(log_path)
 
     epoch_num = 20

@@ -62,7 +62,7 @@ class ResNeXt(nn.Module):
         self.pool = nn.AvgPool2d(8)
         self.classifier = nn.Sequential(
             nn.Linear(1024, class_num),
-            nn.LogSoftmax(dim=1)
+            nn.Softmax(dim=1)
         )
     
     def forward(self, x):
