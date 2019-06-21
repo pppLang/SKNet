@@ -10,12 +10,12 @@ from train import train_epoch, test
 
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "6"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 if __name__=="__main__":
 
-    root_path = '/home/D/langzhiqiang/data_cifia10/'
+    root_path = '/home/ppplang/Documents/SKNet/data_cifia10'
 
     train_loader = torch.utils.data.DataLoader(MyDataset('train', root_path=root_path), batch_size=128, shuffle=True)
     test_loader = torch.utils.data.DataLoader(MyDataset('test', root_path=root_path), batch_size=100)

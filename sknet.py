@@ -25,7 +25,7 @@ class SKConv(nn.Module):
                 nn.BatchNorm2d(features),
                 nn.ReLU(inplace=False)
             ))
-        self.gap = nn.AvgPool2d(int(WH/stride))
+        # self.gap = nn.AvgPool2d(int(WH/stride))
         self.fc = nn.Linear(features, d)
         self.fcs = nn.ModuleList([])
         for i in range(M):
@@ -42,7 +42,8 @@ class SKConv(nn.Module):
             else:
                 feas = torch.cat([feas, fea], dim=1)
         fea_U = torch.sum(feas, dim=1)
-        fea_s = self.gap(fea_U).squeeze_()
+        # fea_s = self.gap(fea_U).squeeze_()
+        fea_s = fea_U.mean(-1).mean(-1)
         fea_z = self.fc(fea_s)
         for i, fc in enumerate(self.fcs):
             vector = fc(fea_z).unsqueeze_(dim=1)
@@ -143,7 +144,7 @@ class SKNet(nn.Module):
 
 
 if __name__=='__main__':
-    x = torch.rand(8,64,32,32)
+    x = torch.rand(8, 64, 32, 32)
     conv = SKConv(64, 32, 3, 8, 2)
     out = conv(x)
     criterion = nn.L1Loss()
